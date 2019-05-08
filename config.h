@@ -85,57 +85,38 @@ unsigned int tabspaces = 8;
 /* bg opacity */
 float alpha = 0.8;
 
-/* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
-	/* solarized dark */
-	"#073642",  /*  0: black    */
-	"#dc322f",  /*  1: red      */
-	"#859900",  /*  2: green    */
-	"#b58900",  /*  3: yellow   */
-	"#268bd2",  /*  4: blue     */
-	"#d33682",  /*  5: magenta  */
-	"#2aa198",  /*  6: cyan     */
-	"#eee8d5",  /*  7: white    */
-	"#002b36",  /*  8: brblack  */
-	"#cb4b16",  /*  9: brred    */
-	"#586e75",  /* 10: brgreen  */
-	"#657b83",  /* 11: bryellow */
-	"#839496",  /* 12: brblue   */
-	"#6c71c4",  /* 13: brmagenta*/
-	"#93a1a1",  /* 14: brcyan   */
-	"#fdf6e3",  /* 15: brwhite  */
-};
-
-/* Terminal colors for alternate (light) palette */
-static const char *altcolorname[] = {
-	/* solarized light */
-	"#eee8d5",  /*  0: black    */
-	"#dc322f",  /*  1: red      */
-	"#859900",  /*  2: green    */
-	"#b58900",  /*  3: yellow   */
-	"#268bd2",  /*  4: blue     */
-	"#d33682",  /*  5: magenta  */
-	"#2aa198",  /*  6: cyan     */
-	"#073642",  /*  7: white    */
-	"#fdf6e3",  /*  8: brblack  */
-	"#cb4b16",  /*  9: brred    */
-	"#93a1a1",  /* 10: brgreen  */
-	"#839496",  /* 11: bryellow */
-	"#657b83",  /* 12: brblue   */
-	"#6c71c4",  /* 13: brmagenta*/
-	"#586e75",  /* 14: brcyan   */
-	"#002b36",  /* 15: brwhite  */
+	"#282828", /* hard contrast: #1d2021 / soft contrast: #32302f */
+	"#cc241d",
+	"#98971a",
+	"#d79921",
+	"#458588",
+	"#b16286",
+	"#689d6a",
+	"#a89984",
+	"#928374",
+	"#fb4934",
+	"#b8bb26",
+	"#fabd2f",
+	"#83a598",
+	"#d3869b",
+	"#8ec07c",
+	"#ebdbb2",
+	[255] = 0,
+	/* more colors can be added after 255 to use with DefaultXX */
+	"black",   /* 256 -> bg */
+	"white",   /* 257 -> fg */
 };
 
 
 /*
- * Default colors (colorname index)
- * foreground, background, cursor, reverse cursor
- */
-unsigned int defaultfg = 12;
-unsigned int defaultbg = 8;
-static unsigned int defaultcs = 14;
-static unsigned int defaultrcs = 15;
+ *  * Default colors (colorname index)
+ *   * foreground, background, cursor, reverse cursor
+ *    */
+unsigned int defaultfg = 15;
+unsigned int defaultbg = 0;
+static unsigned int defaultcs = 15;
+static unsigned int defaultrcs = 0;
 
 /*
  * Default shape of cursor
@@ -180,6 +161,16 @@ static MouseShortcut mshortcuts[] = {
 #define MODKEY Mod1Mask
 #define TERMMOD (ControlMask|ShiftMask)
 
+static char *openurlcmd[] = { "/bin/sh", "-c",
+    "sed 's/.*│//g' | tr -d '\n' | grep -aEo '((http|https)://|www\\.)[a-zA-Z0-9./&?=_-]*' | uniq | sed 's/^www./http:\\/\\/www\\./g' | dmenu -p 'Follow which url?' -l 10 | xargs -r xdg-open",
+    "externalpipe", NULL };
+
+static char *copyurlcmd[] = { "/bin/sh", "-c",
+    "sed 's/.*│//g' | tr -d '\n' | grep -aEo '((http|https)://|www\\.)[a-zA-Z0-9./&?=_-]*' | uniq | sed 's/^www./http:\\/\\/www\\./g' | dmenu -p 'Copy which url?' -l 10 | tr -d '\n' | xclip -selection clipboard",
+    "externalpipe", NULL };
+
+static char *copyoutput[] = { "/bin/sh", "-c", "st-copyout", "externalpipe", NULL };
+
 static Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
 	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
@@ -194,7 +185,10 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
-	{ XK_ANY_MOD,           XK_F6,          swapcolors,     {.i =  0} },
+	{ MODKEY,           	XK_l,           externalpipe,   {.v = openurlcmd } },
+	{ MODKEY,           	XK_y,           externalpipe,   {.v = copyurlcmd } },
+	{ MODKEY,           	XK_o,           externalpipe,   {.v = copyoutput } },
+
 };
 
 /*
@@ -474,6 +468,6 @@ static uint selmasks[] = {
  * of single wide characters.
  */
 static char ascii_printable[] =
-	" !\"#$%&'()*+,-./0123456789:;<=>?"
-	"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-	"`abcdefghijklmnopqrstuvwxyz{|}~";
+" !\"#$%&'()*+,-./0123456789:;<=>?"
+"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+"`abcdefghijklmnopqrstuvwxyz{|}~";

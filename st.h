@@ -83,6 +83,7 @@ void draw(void);
 void printscreen(const Arg *);
 void printsel(const Arg *);
 void sendbreak(const Arg *);
+void externalpipe(const Arg *);
 void toggleprinter(const Arg *);
 
 int tattrset(int);
@@ -117,7 +118,6 @@ extern char *vtiden;
 extern wchar_t *worddelimiters;
 extern int allowaltscreen;
 extern char *termname;
-extern int usealtcolors;
 extern unsigned int tabspaces;
 extern unsigned int defaultfg;
 extern unsigned int defaultbg;
